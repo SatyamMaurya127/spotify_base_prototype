@@ -7,6 +7,7 @@ const router = express.Router();
 router.post("/", async (req: any, res: any) => {
   try {
     const { spotifyUrl } = req.body;
+    console.log(spotifyUrl);
 
     if (!spotifyUrl) {
       return res.status(400).json({ error: "Spotify URL is required" });
@@ -18,9 +19,12 @@ router.post("/", async (req: any, res: any) => {
 
     // Step 2: Use yt-dlp to download
     const searchQuery = `${metadata.title} ${metadata.artist}`;
-    await downloadFromYouTube(searchQuery);
-
-    res.json({ message: "Download initiated successfully" });
+    try {
+      downloadFromYouTube(searchQuery, res);
+    } catch (error: any) {
+      console.error(error.message);
+      res.status(500).json({ error: "Failed to stream audio" });
+    }
   } catch (error: any) {
     console.error(error.message);
     res.status(500).json({ error: "Failed to process download" });

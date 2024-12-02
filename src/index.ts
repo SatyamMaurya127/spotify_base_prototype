@@ -1,20 +1,27 @@
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import downloaderRoutes from "./downloader";
 
+require("dotenv").config();
+
 const app = express();
-const PORT = 5000;
+const PORT = 3000;
 
-// Middleware for parsing JSON
 app.use(express.json());
-
-// Register routes
-app.use("/api/download", downloaderRoutes);
-
-// Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.message);
   res.status(500).json({ error: "Internal Server Error" });
 });
+
+app.use(
+  cors({
+    origin: "http://localhost:5500", // Replace with your frontend's URL and port
+    methods: ["GET", "POST"], // Specify the allowed HTTP methods
+    allowedHeaders: ["Content-Type"], // Specify allowed headers
+  })
+);
+
+app.use("/api/download", downloaderRoutes);
 
 // Start the server
 app.listen(PORT, () => {
